@@ -1,0 +1,5 @@
+cryptg
+pandas
+python_dateutil
+tqdm
+Telethon
