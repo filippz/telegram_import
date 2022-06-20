@@ -34,3 +34,7 @@ this.
 Imported data is seen on both sides (so you essentially have double messages - the original and imported ones on
 your side). Imported messages are visibly flagged as such, and have the date/time of import and visible original
 date/time.
+
+When exporting the chat history you need to export to JSON format, check all the file types with maximum available size.
+If you skip some file types or filter some of them based on their size the import will fail as the messages refer to
+the files that are missing from export.
