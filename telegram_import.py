@@ -15,7 +15,7 @@ from telethon.sync import TelegramClient
 from tqdm import tqdm
 
 
-# Telegram does not understand its own export format - but you can import the Whatsapp one...
+# Telegram does not understand fits own export format - but you can import the Whatsapp one...
 # https://github.com/TelegramTools/TLImporter/issues/10
 # DD/MM/YY, HH:mm - SenderName SenderSurname: attachment.ext (attached file)\n Chat text or file caption
 def convert_to_whatsapp_format(data, only_first_n_messages=math.inf):
@@ -27,14 +27,14 @@ def convert_to_whatsapp_format(data, only_first_n_messages=math.inf):
     for index, row in df.iterrows():
         is_photo = False
         file = None
-        if not pd.isnull(row["file"]):
+        if ("file" in row.index) and (not pd.isnull(row["file"])):
             file = row["file"]
         else:
-            if not pd.isnull(row["photo"]):
+            if ("photo" in row.index) and (not pd.isnull(row["photo"])):
                 file = row["photo"]
                 is_photo = True
             else:
-                if not pd.isnull(row["contact_vcard"]):
+                if ("contact_vcard" in row.index) and (not pd.isnull(row["contact_vcard"])):
                     file = row["contact_vcard"]
 
         date = parse(row["date"])
@@ -63,11 +63,14 @@ def convert_to_whatsapp_format(data, only_first_n_messages=math.inf):
             filelist[file] = {
                 "filename": filename,
                 "media_type": media_type,
-                "duration_seconds": row["duration_seconds"],
-                "width": row["width"],
-                "height": row["height"],
                 "is_photo": is_photo
             }
+            if "duration_seconds" in row.index:
+                filelist[file]["duration_seconds"] = row["duration_seconds"]
+            if "width" in row.index:
+                filelist[file]["width"] = row["width"]
+            if "height" in row.index:
+                filelist[file]["height"] = row["height"]
             message += "{filename} (file attached)\n".format(filename=filename)
 
         message += text
@@ -111,11 +114,11 @@ def upload_file(client, peer, history_import_id, path, file, file_data):
     w = None
     h = None
     duration = None
-    if not pd.isnull(file_data["width"]):
+    if ("width" in file_data) and (not pd.isnull(file_data["width"])):
         w = int(file_data["width"])
-    if not pd.isnull(file_data["height"]):
+    if ("height" in file_data) and (not pd.isnull(file_data["height"])):
         h = int(file_data["height"])
-    if not pd.isnull(file_data["duration_seconds"]):
+    if ("duration_seconds" in file_data) and (not pd.isnull(file_data["duration_seconds"])):
         duration = int(file_data["duration_seconds"])
     if (mime_type == "image/jpg") or (mime_type == "image/jpeg"):
         if file_data["is_photo"]:
