@@ -41,12 +41,14 @@ def convert_to_whatsapp_format(data, only_first_n_messages=math.inf):
         sender = row["from"]
 
         text = row["text"]
-        media_type = row["media_type"]
-        if media_type == "sticker":
-            if not pd.isnull(row["sticker_emoji"]):
-                text = row["sticker_emoji"]
-            else:
-                text = row["text"]
+        media_type = None
+        if "media_type" in row:
+            media_type = row["media_type"]
+            if media_type == "sticker":
+                if not pd.isnull(row["sticker_emoji"]):
+                    text = row["sticker_emoji"]
+                else:
+                    text = row["text"]
 
         if isinstance(text, list):
             tmp_text = ""
