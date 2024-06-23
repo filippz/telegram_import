@@ -1,5 +1,5 @@
 cryptg
 pandas
-python_dateutil
+python-dateutil
 tqdm
 Telethon
