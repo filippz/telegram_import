@@ -24,7 +24,20 @@ def convert_to_whatsapp_format(data, only_first_n_messages=math.inf):
         df = df[:only_first_n_messages]
     filelist = dict()
     messages = list()
+
     for index, row in df.iterrows():
+        date = parse(row["date"])
+
+        if (len(messages) == 0) and (data['type'] in ['private_group', 'public_supergroup']):
+            assert row['action'] == 'create_group'
+            #messages.append("{datetime} - Messages and calls are end-to-end encrypted. No one outside of this chat, not even WhatsApp, can read or listen to them. Tap to learn more.\n".format(datetime=date.strftime("%d/%m/%y, %H:%M:%S")))
+            #if (data['type'] == 'private_group'):
+            #    messages.append("{datetime} - Messages to this group are now secured with end-to-end encryption. Tap for more info.\n".format(datetime=date.strftime("%d/%m/%y, %H:%M:%S")))
+            messages.append("{datetime} - {actor} created group \"{title}\"\n".format(datetime=date.strftime("%d/%m/%y, %H:%M:%S"), actor=row["actor"], title=row["title"]))
+            continue
+
+        sender = row["from"]
+
         is_photo = False
         file = None
         if ("file" in row.index) and (not pd.isnull(row["file"])):
@@ -36,9 +49,6 @@ def convert_to_whatsapp_format(data, only_first_n_messages=math.inf):
             else:
                 if ("contact_vcard" in row.index) and (not pd.isnull(row["contact_vcard"])):
                     file = row["contact_vcard"]
-
-        date = parse(row["date"])
-        sender = row["from"]
 
         text = row["text"]
         media_type = None
@@ -173,15 +183,14 @@ def import_history(path, peer, test_only=False, only_first_n_messages=math.inf):
     file = path + r"\result.json"
     with open(file, encoding='utf-8') as f:
         data = json.load(f)
-        assert data['type'] == 'personal_chat'
 
     print("Converting format")
     messages, file_list = convert_to_whatsapp_format(data, only_first_n_messages)
-    messages_head = "\n".join(messages[:100])
+    messages_head = "".join(messages[:100])
 
     with TelegramClient("telegram_import", api_id, api_hash) as client:
         # check if Telegram API understands the import file based on first 100 rows
-        (functions.messages.CheckHistoryImportRequest(
+        client(functions.messages.CheckHistoryImportRequest(
             import_head=messages_head
         ))
 
