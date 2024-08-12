@@ -205,7 +205,7 @@ def import_history(path, peer, test_only=False, only_first_n_messages=math.inf):
         ntf.close()
 
         # initiate actual import
-        print("Staring import")
+        print("Starting import")
         history_import = client(functions.messages.InitHistoryImportRequest(
             peer=peer,
             file=client.upload_file(ntf.name),
