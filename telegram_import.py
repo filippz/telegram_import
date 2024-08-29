@@ -136,9 +136,11 @@ def upload_file(client, peer, history_import_id, path, file, file_data):
         if file_data["is_photo"]:
             media = types.InputMediaUploadedPhoto(file=input_file)
         else:
-            attributes = [types.DocumentAttributeImageSize(w, h)]
+            attributes = []
+            if not((w is None) or (h is None)):
+                attributes.append(types.DocumentAttributeImageSize(w, h))
             media = types.InputMediaUploadedDocument(file=input_file, mime_type=mime_type,
-                                                     attributes=attributes)
+                                                    attributes=attributes)
     else:
         attributes = list()
         if media_type == "animation":
