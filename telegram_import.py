@@ -191,6 +191,11 @@ def import_history(path, peer, test_only=False, only_first_n_messages=math.inf):
     messages_head = "".join(messages[:100])
 
     with TelegramClient("telegram_import", api_id, api_hash) as client:
+        try:
+            peer = client.get_entity(types.PeerChannel(int(peer)))
+        except:
+            pass
+
         # check if Telegram API understands the import file based on first 100 rows
         client(functions.messages.CheckHistoryImportRequest(
             import_head=messages_head
