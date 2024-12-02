@@ -94,7 +94,7 @@ def convert_to_whatsapp_format(data, only_first_n_messages=math.inf):
 
 
 def upload_file(client, peer, history_import_id, path, file, file_data):
-    file = path + "\\" + file.replace("/", "\\")
+    file = path.joinpath(file)
     file_name = file_data["filename"]
     media_type = file_data["media_type"]
 
@@ -182,7 +182,7 @@ def import_history(path, peer, test_only=False, only_first_n_messages=math.inf):
     api_hash = config['API']['api_hash']
 
     print("Loading result.json")
-    file = path + r"\result.json"
+    file = path.joinpath("result.json")
     with open(file, encoding='utf-8') as f:
         data = json.load(f)
 
@@ -254,7 +254,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     import_history(
-        path=args.path,
+        path=pathlib.Path(args.path),
         peer=args.peer,
         test_only=args.test_only
     )
